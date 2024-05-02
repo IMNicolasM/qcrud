@@ -473,7 +473,7 @@ export default {
           const defaultMessage = this.$tr('isite.cms.message.recordCreated');
 
           const message = useSystemMessage
-            ? (requestInfo.response.message || defaultMessage)
+            ? (requestInfo.response?.message || defaultMessage)
             : defaultMessage
 
           this.messageWindow(
@@ -493,7 +493,7 @@ export default {
           const defaultMessage = this.$tr('isite.cms.message.recordNoCreated');
 
           const message = useSystemMessage
-            ? (requestInfo.error.message || defaultMessage)
+            ? (requestInfo.error?.message || defaultMessage)
             : defaultMessage
 
           this.messageWindow(
@@ -588,7 +588,7 @@ export default {
           const defaultMessage = this.$tr('isite.cms.message.recordUpdated');
 
           const message = useSystemMessage
-            ? (requestInfo.response.message || defaultMessage)
+            ? (requestInfo.response?.message || defaultMessage)
             : defaultMessage
 
           this.messageWindow(
@@ -608,7 +608,7 @@ export default {
           const defaultMessage = this.$tr('isite.cms.message.recordNoCreated');
 
           const message = useSystemMessage
-            ? (requestInfo.error.message || defaultMessage)
+            ? (requestInfo.error?.message || defaultMessage)
             : defaultMessage
 
           this.messageWindow(
