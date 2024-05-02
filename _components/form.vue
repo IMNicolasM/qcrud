@@ -464,13 +464,21 @@ export default {
           requestInfo.error = err;
         }
 
+        const useSystemMessage = propParams.create.useSystemMessage;
+
         //Action after request
         if (requestInfo.response) {
           eventBus.emit(`${propParams.apiRoute}.crud.event.created`);//emmit event
 
+          const defaultMessage = this.$tr('isite.cms.message.recordCreated');
+
+          const message = useSystemMessage
+            ? (requestInfo.response.message || defaultMessage)
+            : defaultMessage
+
           this.messageWindow(
             'info',
-            { message: `${this.$tr('isite.cms.message.recordCreated')}` }
+            { message }
           );
           //Dispatch hook event
           await this.$hook.dispatchEvent('wasCreated', { entityName: this.params.entityName });
@@ -482,12 +490,18 @@ export default {
           if (this.params.create?.callback) this.params.create.callback(requestInfo.response.data);
         } else {
 
+          const defaultMessage = this.$tr('isite.cms.message.recordNoCreated');
+
+          const message = useSystemMessage
+            ? (requestInfo.error.message || defaultMessage)
+            : defaultMessage
+
           this.messageWindow(
             'error',
-            { message: `${this.$tr('isite.cms.message.recordNoCreated')}` }
+            { message }
           );
           this.loading = false;//login hide
-          if (requestInfo.error) {//Message Validate
+          if (requestInfo.error && !useSystemMessage) {//Message Validate
             let errorMsg = JSON.parse(requestInfo.error);
             if (errorMsg.email) {
               this.$alert.error({
@@ -526,7 +540,9 @@ export default {
       if (this.paramsProps.field && this.dataField.id) criteria = this.dataField.id;
 
       try {
-        if (propParams.update.method) {
+        if (propParams.update.customFormResponse) {
+          response = await propParams.update.customFormResponse(criteria, formData, customParams);
+        } else if (propParams.update.method) {
           // Call custom method
           response = await propParams.update.method(criteria, formData, customParams);
         } else {
@@ -563,13 +579,21 @@ export default {
           requestInfo.response = true;
         }
 
+        const useSystemMessage = this.params?.update?.useSystemMessage;
+
         //Action after request
         if (requestInfo.response) {
           eventBus.emit(`crudForm${propParams.apiRoute}Updated`);//emmit event
 
+          const defaultMessage = this.$tr('isite.cms.message.recordUpdated');
+
+          const message = useSystemMessage
+            ? (requestInfo.response.message || defaultMessage)
+            : defaultMessage
+
           this.messageWindow(
             'info',
-            { message: this.$tr('isite.cms.message.recordUpdated') }
+            { message }
           );
           //Dispatch hook event
           await this.$hook.dispatchEvent('wasUpdated', { entityName: this.params.entityName });
@@ -581,9 +605,15 @@ export default {
         } else {
           this.loading = false;
 
+          const defaultMessage = this.$tr('isite.cms.message.recordNoCreated');
+
+          const message = useSystemMessage
+            ? (requestInfo.error.message || defaultMessage)
+            : defaultMessage
+
           this.messageWindow(
             'error',
-            { message: this.$tr('isite.cms.message.recordNoUpdated') }
+            { message }
           );
         }
       }
