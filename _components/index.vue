@@ -100,7 +100,7 @@
             </q-tr>
           </template>
           <template v-slot:body="props">
-            <q-tr :props="props">
+            <q-tr :props="props" :class="isDisableRow(props?.row) ? 'disabled' : ''">
               <q-td
                 v-for="(col, keyCol) in parseColumnsByRow(props.cols, props.row)"
                 :key="col.name"
@@ -125,7 +125,7 @@
                   />
                 </div>
                 <!--Actions column-->
-                <div class="crudIndexActionsColumn" v-if="col.name == 'actions'">
+                <div class="crudIndexActionsColumn" v-if="col.name == 'actions' && !isDisableRow(props?.row)">
                   <btn-menu
                     :actions="fieldActions(col)"
                     :action-data="props.row"
@@ -1428,6 +1428,9 @@ export default {
       this.dynamicFilterValues = filters;
       this.table.filter = filters;
       this.getDataTable(false, filters, { page: 1 });
+    },
+    isDisableRow(row) {
+      return this.params?.read?.disabled?.row(row) || false
     }
   }
 };
