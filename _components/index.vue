@@ -125,7 +125,7 @@
                   />
                 </div>
                 <!--Actions column-->
-                <div class="crudIndexActionsColumn" v-if="col.name == 'actions' && !isDisableRow(props?.row)">
+                <div class="crudIndexActionsColumn" v-if="col.name == 'actions' && !isDisableRow(props?.row, 'action')">
                   <btn-menu
                     :actions="fieldActions(col)"
                     :action-data="props.row"
@@ -1429,8 +1429,14 @@ export default {
       this.table.filter = filters;
       this.getDataTable(false, filters, { page: 1 });
     },
-    isDisableRow(row) {
-      return this.params?.read?.disabled?.row(row) || false
+    isDisableRow(row, type = '') {
+      const disabledRow = this.params?.read?.disabled?.row
+      if(disabledRow) return disabledRow(row)
+
+      const disabledAction = this.params.read?.disabled?.action;
+      if(type == 'action' && disabledAction) return disabledAction(row)
+
+      return false
     }
   }
 };
