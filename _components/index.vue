@@ -874,10 +874,6 @@ export default {
       let propParams = this.$clone(this.params);
       this.loading = true;
 
-      //fixs null computed table pagination
-      if(pagination.sortBy == null){
-        pagination.sortBy = this.table.pagination.sortBy ?? 'id'
-      }
 
       //Reset selected Rows
       this.selectedRows = [];
