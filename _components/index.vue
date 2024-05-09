@@ -100,12 +100,12 @@
             </q-tr>
           </template>
           <template v-slot:body="props">
-            <q-tr :props="props" :class="isDisableRow(props?.row) ? 'disabled' : ''">
+            <q-tr :props="props">
               <q-td
                 v-for="(col, keyCol) in parseColumnsByRow(props.cols, props.row)"
                 :key="col.name"
                 :props="props"
-                :class="col.bgColor ? 'bg-'+col.bgColor : ''"
+                :class="`${isDisableRow(props?.row) && col.name != 'actions' ? 'disabled no-pointer-events' : ''} ${col.bgColor ? 'bg-'+col.bgColor : ''}`"
               >
                 <!-- Select row -->
                 <div v-if="col.name === 'selectColumn'">
@@ -125,7 +125,7 @@
                   />
                 </div>
                 <!--Actions column-->
-                <div class="crudIndexActionsColumn" v-if="col.name == 'actions' && !isDisableRow(props?.row, 'action')">
+                <div class="crudIndexActionsColumn" v-if="col.name == 'actions'">
                   <btn-menu
                     :actions="fieldActions(col)"
                     :action-data="props.row"
@@ -1080,15 +1080,14 @@ export default {
     },
     //Return field actions
     fieldActions(field) {
-      let actions = this.$clone(this.params.read.actions || []);
-      let response = [];
+      let readActions = this.$clone(this.params.read.actions || []);
 
       //
-      let defaultAction = actions.find(action => {
+      let defaultAction = readActions.find(action => {
         return action.default ?? false;
       });
       //Add default actions
-      actions = [
+      let response = [
         {//Edit action
           icon: 'fa-light fa-pencil',
           name: 'edit',
@@ -1141,16 +1140,18 @@ export default {
             filter: { id: item.id }
           })
         },
-        ...actions
-      ];
+      ].map(mainAction => {
+        const mergeAction = readActions.find(a => a?.name === mainAction?.name);
+        if(mergeAction) mainAction = { ...mainAction, ...mergeAction}
+        return mainAction
+      });
 
-      //Order field actions
-      if (actions && actions.length) {
-        actions.forEach(action => {
-          //if (action.format) action = {...action, ...action.format(field)}
-          response.push(action);
-        });
-      }
+      let responseNameActions = response.map(item => item.name)
+      response = [
+        ...response,
+        ...readActions.filter(a => !responseNameActions.includes(a?.name))
+      ]
+
       //response
       return response;
     },
@@ -1428,10 +1429,6 @@ export default {
     isDisableRow(row, type = '') {
       const disabledRow = this.params?.read?.disabled?.row
       if(disabledRow) return disabledRow(row)
-
-      const disabledAction = this.params.read?.disabled?.action;
-      if(type == 'action' && disabledAction) return disabledAction(row)
-
       return false
     }
   }
