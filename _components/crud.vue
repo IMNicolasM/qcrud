@@ -480,6 +480,10 @@ export default {
     },
     async getDataTable(refresh) {
       await this.$refs.crudIndex.getDataTable(refresh);
+    },
+    //Get Dynamic Filters
+    getFilterValues() {
+      return this.$refs.crudIndex?.getDynamicFilterValues
     }
   }
 };
