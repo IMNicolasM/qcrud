@@ -874,7 +874,6 @@ export default {
       let propParams = this.$clone(this.params);
       this.loading = true;
 
-
       //Reset selected Rows
       this.selectedRows = [];
       this.selectedRowsAll = false;
